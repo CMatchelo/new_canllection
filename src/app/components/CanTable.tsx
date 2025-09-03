@@ -12,12 +12,18 @@ export const CanTable = () => {
   const { canCollection } = useCanContext();
   const [displayPopup, setDisplayPopup] = useState(false);
   const [currentCan, setCurrentCan] = useState<CanType | undefined>();
+  const [searchText, setSearchText] = useState("");
 
   const togglePopup = (can?: CanType) => {
     if (can) setCurrentCan(can);
     else setCurrentCan(undefined);
     setDisplayPopup(!displayPopup);
   };
+
+  const filteredCans = canCollection.filter((can) =>
+    can.name.toLowerCase().includes(searchText.toLowerCase()) ||
+    can.type.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <div className="p-4 m-5 rounded-xl shadow-2xl pt-8 bg-secondary1 ">
@@ -28,10 +34,12 @@ export const CanTable = () => {
         <Input
           classname="w-full text-highlight2Dark px-3"
           placeholder="Buscar..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
       </div>
       <div className="mb-5">
-        <span>Exibindo {canCollection.length} latinhas</span>
+        <span>Exibindo {filteredCans.length} latinhas</span>
       </div>
       {displayPopup && (
         <NewCanPopup
@@ -40,13 +48,13 @@ export const CanTable = () => {
         />
       )}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {canCollection.map((can, index) => (
+        {filteredCans.map((can, index) => (
           <CanCard togglePopup={() => togglePopup(can)} key={index} can={can} />
         ))}
-        {canCollection.map((can, index) => (
+        {filteredCans.map((can, index) => (
           <CanCard togglePopup={() => togglePopup(can)} key={index} can={can} />
         ))}
-        {canCollection.map((can, index) => (
+        {filteredCans.map((can, index) => (
           <CanCard togglePopup={() => togglePopup(can)} key={index} can={can} />
         ))}
       </div>

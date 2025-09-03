@@ -2,7 +2,9 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Input } from "../components/Input";
+import { Button } from "../components/Button";
 
 interface LoginFormInputs {
   email: string;
@@ -12,13 +14,23 @@ interface LoginFormInputs {
 export default function PageLogin() {
   const router = useRouter();
   const { user, loading, login, registerAcc, signInWithGoogle } = useAuth();
-  const { register, handleSubmit } = useForm<LoginFormInputs>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>();
+
+  const [hasAcc, setHasAcc] = useState<boolean>(true);
+  const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const toggleHasAcc = () => {
+    setHasAcc(!hasAcc);
+  };
 
   useEffect(() => {
     if (!loading && user) {
       router.push(`/profile/${user.uid}`); // redireciona se não estiver logado
     }
-
   }, [user, loading, router]);
 
   if (loading && !user) {
@@ -26,69 +38,107 @@ export default function PageLogin() {
   }
 
   const onLogin = async (data: LoginFormInputs) => {
-    try {
-      await login?.(data.email, data.password);
-      router.push("/");
-    } catch (err) {
-      console.log(err);
+    setErrorMsg("")
+    if (hasAcc) {
+      try {
+        await login?.(data.email, data.password);
+        router.push("/");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setErrorMsg(err.message);
+        } else {
+          setErrorMsg("Ocorreu um erro inesperado. Tente novamente.");
+        }
+      }
+    } else {
+      try {
+        await registerAcc?.(data.email, data.password);
+        router.push("/");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setErrorMsg(err.message);
+        } else {
+          setErrorMsg("Ocorreu um erro inesperado. Tente novamente.");
+        }
+      }
     }
   };
 
-  const onRegister = async (data: LoginFormInputs) => {
-    console.log(data);
-    await registerAcc?.(data.email, data.password);
-  };
-
   const onGoogleLogin = async () => {
-    await signInWithGoogle();
+    try {
+      await signInWithGoogle();
+      router.push("/");
+    } catch (err) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg("Ocorreu um erro inesperado. Tente novamente.");
+      }
+    }
   };
 
   return (
     <div>
-      <h1>Login Page</h1>
-      <form onSubmit={handleSubmit(onLogin)}>
-        <input
-          {...register("email")}
-          className="bg-amber-100 border-1 border-black p-2"
-          type="text"
-          placeholder="Email"
-        />
-        <input
-          {...register("password")}
-          className="bg-amber-100 border-1 border-black p-2"
-          type="password"
-          placeholder="Password"
-        />
-        <button
-          type="submit"
-          className="bg-amber-300 p-2 cursor-pointer hover:bg-amber-200 transition"
-        >
-          Login
-        </button>
-      </form>
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+            flex flex-col justify-center items-stretch gap-4 w-[90%] max-w-md shadow-2xl
+            bg-primary1 px-4 py-8 sm:px-8 rounded-lg border-1 border-highlight2"
+      >
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onLogin)}>
+          <div className="self-center text-2xl font-bold">
+            {hasAcc ? (
+              <span>Entre na sua conta</span>
+            ) : (
+              <span>Crie sua conta</span>
+            )}
+          </div>
 
-      <h1>Register Page</h1>
-      <form onSubmit={handleSubmit(onRegister)}>
-        <input
-          {...register("email")}
-          className="bg-amber-100 border-1 border-black p-2"
-          type="text"
-          placeholder="Email"
-        />
-        <input
-          {...register("password")}
-          className="bg-amber-100 border-1 border-black p-2"
-          type="password"
-          placeholder="Password"
-        />
-        <button
-          type="submit"
-          className="bg-amber-300 p-2 cursor-pointer hover:bg-amber-200 transition"
+          <Input
+            id="Email"
+            classname="text-secondary1"
+            {...register("email", { required: "Digite o email" })}
+          />
+          {errors.email && (
+            <p className="text-red-500">{errors.email.message}</p>
+          )}
+
+          <Input
+            id="Senha"
+            classname="text-secondary1"
+            {...register("password", { required: "Digite a senha" })}
+          />
+          {errors.password && (
+            <p className="text-red-500">{errors.password.message}</p>
+          )}
+          {hasAcc ? (
+            <Button type="submit">Entrar</Button>
+          ) : (
+            <Button type="submit">Cadastrar</Button>
+          )}
+          {errorMsg && <p className="text-red-500 text-center">{errorMsg}</p>}
+        </form>
+
+        <hr></hr>
+
+        <div
+          onClick={toggleHasAcc}
+          className="flex justify-center cursor-pointer self-center"
         >
-          Login
-        </button>
-      </form>
-      <button onClick={onGoogleLogin}>Sign in with Google</button>
+          {hasAcc ? (
+            <span className="text-center">
+              Ainda não tem uma conta? Cadastre aqui.
+            </span>
+          ) : (
+            <span className="text-center">Já tem uma conta? Entre aqui.</span>
+          )}
+        </div>
+        <Button
+          className="bg-red-600 hover:bg-red-500 active:bg-red-700"
+          onSubmit={onGoogleLogin}
+        >
+          Use sua conta google
+        </Button>
+      </div>
     </div>
   );
 }

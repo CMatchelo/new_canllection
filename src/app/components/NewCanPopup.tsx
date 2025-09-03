@@ -149,13 +149,13 @@ export const NewCanPopup = ({ togglePopup, currentCan }: NewCanPopupProps) => {
           {errors.year && <p className="text-red-500">{errors.year.message}</p>}
 
           <div className="relative flex gap-3 items-center">
-            <label className="ml-auto" htmlFor="Mês">
+            <label className="ml-auto w-[25%]" htmlFor="Mês">
               Mês
             </label>
             <select
               {...register("month", { required: "O mês é obrigatória" })}
               className="border-1 border-highlight1 rounded-lg p-1
-      focus:border-highlight1Light bg-gray-200 w-50"
+      focus:border-highlight1Light bg-gray-200 w-[75%]"
               id="Mês"
             >
               <option value="">-- Selecione --</option>
@@ -170,14 +170,14 @@ export const NewCanPopup = ({ togglePopup, currentCan }: NewCanPopupProps) => {
             <p className="text-red-500">{errors.month.message}</p>
           )}
 
-          <div className="flex gap-3 items-center">
-            <label className="ml-auto" htmlFor="type">
+          <div className="flex gap-3 items-stretch">
+            <label className="ml-auto w-[25%]" htmlFor="type">
               Categoria
             </label>
             <select
               {...register("type", { required: "A categoria é obrigatória" })}
               className="border-1 border-highlight1 rounded-lg p-1
-      focus:border-highlight1Light bg-gray-200 w-50"
+      focus:border-highlight1Light bg-gray-200 w-[75%]"
               id="type"
             >
               <option value="">-- Selecione --</option>

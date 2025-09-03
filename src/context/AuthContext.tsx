@@ -11,6 +11,8 @@ import {
 import { createContext, useEffect, useState } from "react";
 import { auth, googleProvider } from "../../firebase";
 import React from "react";
+import { getFirebaseErrorMessage } from "@/utils/firebaseErrors";
+import { FirebaseError } from "firebase/app";
 
 interface AuthContextType {
   user: User | null;
@@ -48,7 +50,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const temp = await createUserWithEmailAndPassword(auth, email, password);
       setUser(temp.user);
     } catch (err) {
-      console.log(err);
+      if (err instanceof FirebaseError) {
+        const message = getFirebaseErrorMessage(err.code);
+        throw new Error(message);
+      }
+      throw new Error("Ocorreu um erro inesperado. Tente novamente.");
     }
   };
 
@@ -56,8 +62,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const temp = await signInWithEmailAndPassword(auth, email, password);
       setUser(temp.user);
-    } catch (err) {
-      console.log(err);
+    } catch (err: unknown) {
+      if (err instanceof FirebaseError) {
+        const message = getFirebaseErrorMessage(err.code);
+        throw new Error(message);
+      }
+      throw new Error("Ocorreu um erro inesperado. Tente novamente.");
     }
   };
 
@@ -66,11 +76,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await signInWithPopup(auth, googleProvider);
     } catch (err) {
       console.log(err);
+      throw new Error("Ocorreu um erro inesperado. Tente novamente.");
     }
   };
 
   const logout = async () => {
     try {
+      sessionStorage.removeItem(`canList_${user?.uid}`);
       await signOut(auth);
       setUser(null);
     } catch (err) {
