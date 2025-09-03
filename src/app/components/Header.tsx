@@ -19,10 +19,11 @@ export const Header = () => {
   return (
     <div
       className="bg-primary1 text-gray-100
-    p-4 flex flex-row items-center"
+    p-5 flex flex-row items-center"
     >
-      <div>
-        <span className="text-xl">Bem vindo {user?.email}</span>
+      <div className="flex flex-row gap-2">
+        <span className="text-xl">Bem vindo </span>
+        <span className="text-xl hidden sm:block">{user?.email}</span>
       </div>
       <div className="ml-auto flex flex-row items-center">
         <Button onSubmit={onLogout}>

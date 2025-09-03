@@ -6,6 +6,7 @@ import { NewCanPopup } from "./NewCanPopup";
 import { useState } from "react";
 import { Button } from "./Button";
 import { CanType } from "@/types/can";
+import { Input } from "./Input";
 
 export const CanTable = () => {
   const { canCollection } = useCanContext();
@@ -13,23 +14,31 @@ export const CanTable = () => {
   const [currentCan, setCurrentCan] = useState<CanType | undefined>();
 
   const togglePopup = (can?: CanType) => {
-    if (can) setCurrentCan(can)
-    else setCurrentCan(undefined)
+    if (can) setCurrentCan(can);
+    else setCurrentCan(undefined);
     setDisplayPopup(!displayPopup);
-  }
+  };
 
   return (
     <div className="p-4 m-5 rounded-xl shadow-2xl pt-8 bg-secondary1 ">
-      <div className="flex flex-row items-center
-      gap-4 mb-5">
-        <Button onSubmit={() => togglePopup()}>
-          Cadastrar nova
-        </Button>
-        <span>
-          Exibindo {canCollection.length} latinhas
-        </span>
+      <Button className="mb-5" onSubmit={() => togglePopup()}>
+        Cadastrar nova
+      </Button>
+      <div className="mb-5 w-full">
+        <Input
+          classname="w-full text-highlight2Dark px-3"
+          placeholder="Buscar..."
+        />
       </div>
-      {displayPopup && <NewCanPopup editCan={currentCan} togglePopup={() => togglePopup()} />}
+      <div className="mb-5">
+        <span>Exibindo {canCollection.length} latinhas</span>
+      </div>
+      {displayPopup && (
+        <NewCanPopup
+          currentCan={currentCan}
+          togglePopup={() => togglePopup()}
+        />
+      )}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {canCollection.map((can, index) => (
           <CanCard togglePopup={() => togglePopup(can)} key={index} can={can} />

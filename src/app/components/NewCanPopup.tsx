@@ -13,7 +13,7 @@ import { useCanContext } from "@/context/CollectionContext";
 
 interface NewCanPopupProps {
   togglePopup: () => void;
-  editCan?: CanType;
+  currentCan?: CanType;
 }
 
 interface AddCanFormInputs {
@@ -23,17 +23,17 @@ interface AddCanFormInputs {
   type: string;
 }
 
-export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
+export const NewCanPopup = ({ togglePopup, currentCan }: NewCanPopupProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<AddCanFormInputs>({
     defaultValues: {
-      name: editCan?.name || undefined,
-      year: editCan?.year || undefined,
-      month: editCan?.month || undefined,
-      type: editCan?.type || undefined,
+      name: currentCan?.name || undefined,
+      year: currentCan?.year || undefined,
+      month: currentCan?.month || undefined,
+      type: currentCan?.type || undefined,
     },
   });
 
@@ -41,12 +41,12 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [noFileMsg, setNoFileMsg] = useState<boolean>(false);
   const { canCollection, setCanCollection } = useCanContext();
-  const { addCan } = useCanActions();
+  const { addCan, editCan } = useCanActions();
 
   useEffect(() => {
-    if (editCan) console.log("EDitcan: ", editCan);
-    if (editCan) setPreview(editCan.imgurl);
-  }, [editCan]);
+    if (currentCan) console.log("currentcan: ", currentCan);
+    if (currentCan) setPreview(currentCan.imgurl);
+  }, [currentCan]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -64,26 +64,26 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
   const handleAddCan = async (data: AddCanFormInputs) => {
     const newCan: CanType = {
       ...data,
-      id: editCan?.id || crypto.randomUUID(),
-      imgurl: editCan?.imgurl || "",
-      userId: editCan?.userId || "",
+      id: currentCan?.id || crypto.randomUUID(),
+      imgurl: currentCan?.imgurl || "",
+      userId: currentCan?.userId || "",
     };
 
-    if (!editCan && !selectedFile) {
+    if (!currentCan && !selectedFile) {
       setNoFileMsg(true);
       return;
     }
 
-    if (editCan) {
-      console.log("Editando can:", newCan);
+    if (currentCan) {
+      await editCan(newCan)
       setCanCollection(
-        canCollection.map((can) => (can.id === editCan.id ? newCan : can))
+        canCollection.map((can) => (can.id === currentCan.id ? newCan : can))
       );
     } else {
-      console.log("Adding can");
-      /* const can = await addCan(newCan, selectedFile); */
-      if (newCan) {
-        setCanCollection([...canCollection, newCan]);
+      if (!selectedFile) return;
+      const can = await addCan(newCan, selectedFile);
+      if (can) {
+        setCanCollection([...canCollection, can]);
       }
     }
     togglePopup();
@@ -113,7 +113,7 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
                 />
               </div>
             )}
-            {!editCan && (
+            {!currentCan && (
               <div>
                 <input
                   id="Imagem"
@@ -206,3 +206,7 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
     </div>
   );
 };
+function deleteCan(currentCan: CanType) {
+  throw new Error("Function not implemented.");
+}
+

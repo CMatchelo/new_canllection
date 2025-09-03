@@ -5,6 +5,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  setDoc,
 } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 import { CanType } from "@/types/can";
@@ -84,6 +85,21 @@ export const useCanActions = () => {
     }
   };
 
+  const editCan = async (editCan: CanType) => {
+    console.log("Editing: ", editCan);
+    try {
+      if (!user?.uid || !editCan.id) {
+        throw new Error("Informe todos os IDs");
+      }
+      const canRef = doc(db, user.uid, editCan.id);
+      console.log("Canref: ", canRef);
+      const docRef = await setDoc(canRef, editCan, { merge: true });
+      console.log("Doc atualizado", docRef);
+    } catch (err) {
+      console.error("Erro ao atualizar: ", err);
+    }
+  }
+
   const deleteCan = async (id: string, url: string) => {
     
     if (!user) return;
@@ -105,6 +121,7 @@ export const useCanActions = () => {
   return {
     getCanCollection,
     addCan,
-    deleteCan,
+    editCan,
+    deleteCan
   };
 };
