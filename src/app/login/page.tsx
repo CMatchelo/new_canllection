@@ -15,20 +15,18 @@ export default function PageLogin() {
   const { register, handleSubmit } = useForm<LoginFormInputs>();
 
   useEffect(() => {
-    console.log("Mudou algum");
     if (!loading && user) {
       router.push(`/profile/${user.uid}`); // redireciona se não estiver logado
     }
 
   }, [user, loading, router]);
 
-  if (loading || !user) {
+  if (loading && !user) {
     return <div>Carregando...</div>; // evita renderizar a página antes do check
   }
 
   const onLogin = async (data: LoginFormInputs) => {
     try {
-      console.log(data);
       await login?.(data.email, data.password);
       router.push("/");
     } catch (err) {
@@ -42,7 +40,6 @@ export default function PageLogin() {
   };
 
   const onGoogleLogin = async () => {
-    console.log("Oi");
     await signInWithGoogle();
   };
 
