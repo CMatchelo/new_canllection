@@ -51,12 +51,6 @@ export const CanTable = () => {
         {filteredCans.map((can, index) => (
           <CanCard togglePopup={() => togglePopup(can)} key={index} can={can} />
         ))}
-        {filteredCans.map((can, index) => (
-          <CanCard togglePopup={() => togglePopup(can)} key={index} can={can} />
-        ))}
-        {filteredCans.map((can, index) => (
-          <CanCard togglePopup={() => togglePopup(can)} key={index} can={can} />
-        ))}
       </div>
     </div>
   );
