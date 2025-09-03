@@ -40,7 +40,9 @@ export const CanCollectionProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [user, refreshCanCollection]);
 
+  // Atualiza se canCollection mudar
   useEffect(() => {
+    console.log("Collection changed", canCollection)
     sessionStorage.setItem(
       `canList_${user?.uid}`,
       JSON.stringify(canCollection)

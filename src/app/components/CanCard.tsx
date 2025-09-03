@@ -29,12 +29,14 @@ export const CanCard = ({ can, togglePopup }: CanCardProps) => {
   return (
     <div className="p-3 border-1 border-highlight2 rounded-lg shadow-lg">
       <div className="relative w-full aspect-square rounded overflow-hidden shadow">
+      {can.imgurl && (
         <Image
-          alt={`Imagem da ${can.name}`}
-          src={can.imgurl}
-          fill
-          style={{ objectFit: "cover" }}
-        ></Image>
+        alt={`Imagem da ${can.name}`}
+        src={can.imgurl}
+        fill
+        style={{ objectFit: "cover" }}
+        />
+      )}
       </div>
       <div className="flex flex-col mt-4">
         <span className="text-xl font-bold">{can.name}</span>

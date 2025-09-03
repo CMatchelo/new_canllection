@@ -5,7 +5,7 @@ import { Button } from "./Button";
 import { Input } from "./Input";
 import { useForm } from "react-hook-form";
 import { CanType } from "@/types/can";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { months, categories } from "@/utils/objectsArray";
 import { useCanActions } from "../hooks/useCansActions";
@@ -40,8 +40,13 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [noFileMsg, setNoFileMsg] = useState<boolean>(false);
-  const {canCollection, setCanCollection} = useCanContext();
+  const { canCollection, setCanCollection } = useCanContext();
   const { addCan } = useCanActions();
+
+  useEffect(() => {
+    if (editCan) console.log("EDitcan: ", editCan);
+    if (editCan) setPreview(editCan.imgurl);
+  }, [editCan]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,18 +64,30 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
   const handleAddCan = async (data: AddCanFormInputs) => {
     const newCan: CanType = {
       ...data,
-      imgurl: "string",
-      userId: "string"
+      id: editCan?.id || crypto.randomUUID(),
+      imgurl: editCan?.imgurl || "",
+      userId: editCan?.userId || "",
     };
-    if (selectedFile) {
-      const can = await addCan(newCan, selectedFile);
-      if (can) {
-        setCanCollection([...canCollection, can]);
-        togglePopup();
-      }
-    } else {
+
+    if (!editCan && !selectedFile) {
       setNoFileMsg(true);
+      return;
     }
+
+    if (editCan) {
+      console.log("Editando can:", newCan);
+      setCanCollection(
+        canCollection.map((can) => (can.id === editCan.id ? newCan : can))
+      );
+    } else {
+      console.log("Adding can");
+      /* const can = await addCan(newCan, selectedFile); */
+      if (newCan) {
+        setCanCollection([...canCollection, newCan]);
+      }
+    }
+    togglePopup();
+    setNoFileMsg(false);
   };
 
   return (
@@ -85,14 +102,6 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
           <h2 className="font-extrabold text-xl self-center">Nova latinha</h2>
 
           <div className="relative flex flex-col gap-2 mb-2 items-center justify-center self-center w-50">
-            <input
-              id="Imagem"
-              name="Imagem"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileChange}
-            />
             {preview && (
               <div className="w-40 h-40 relative rounded-lg overflow-hidden border border-gray-300">
                 <Image
@@ -104,13 +113,25 @@ export const NewCanPopup = ({ togglePopup, editCan }: NewCanPopupProps) => {
                 />
               </div>
             )}
-            <label
-              htmlFor="Imagem"
-              className="cursor-pointer bg-highlight1 text-white px-3 py-1 rounded-lg
+            {!editCan && (
+              <div>
+                <input
+                  id="Imagem"
+                  name="Imagem"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <label
+                  htmlFor="Imagem"
+                  className="cursor-pointer bg-highlight1 text-white px-3 py-1 rounded-lg
                  border border-highlight1 hover:bg-highlight1Light transition"
-            >
-              Escolher imagem
-            </label>
+                >
+                  Escolher imagem
+                </label>
+              </div>
+            )}
           </div>
           {noFileMsg && <p className="text-red-500">Imagem é obrigatória</p>}
 

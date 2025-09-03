@@ -63,9 +63,8 @@ export const useCanActions = () => {
   }, [user]);
 
   const addCan = async (newCan: CanType, file: File) => {
-    const id = crypto.randomUUID();
 
-    const fileRef = ref(storage, `${user?.uid}/${id}`);
+    const fileRef = ref(storage, `${user?.uid}/${newCan.id}`);
 
     try {
       const compressedFile = await imageCompression(file, options);
