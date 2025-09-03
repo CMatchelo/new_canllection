@@ -22,6 +22,6 @@ export const categories = [
   { value: "Cachaça", label: "Cachaça" },
   { value: "Extrato de tomate", label: "Extrato de tomate" },
   { value: "Água de coco", label: "Água de coco" },
-  { value: "Inportadas", label: "Inportadas" }, // parece que há um erro de digitação, deveria ser "Importadas" 😉
+  { value: "Importadas", label: "Importadas" },
   { value: "Outros", label: "Outros" },
 ];
